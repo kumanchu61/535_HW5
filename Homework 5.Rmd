@@ -5,18 +5,14 @@ date: "2025-12-01"
 output: pdf_document
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=FALSE, error=FALSE, warning=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Setup
+# Setup Option 2
 
 ```{r}
 library(tidyverse)
-library(forcats)
-library(sf)
-library(lubridate)
-library(broom)
 
 homicides <- read.csv("homicide-data.csv") %>% 
   mutate(city_name = paste(city, state, sep = ", "))
@@ -24,15 +20,75 @@ homicides <- read.csv("homicide-data.csv") %>%
 ```
 
 
-# Cleaning
+# Cleaning Option 2
 
 ```{r}
-los_angeles <- homicides %>% 
-  filter(city == "Los Angeles", state == "CA") %>%
+baltimore <- homicides %>% 
+  filter(city_name == "Baltimore, MD") %>%
   mutate(
     date = ymd(reported_date),
     year = year(date),
-    month = month(date)
-  )
+    month = month(date))
+
+
+baltimore_monthly <- baltimore %>% 
+  group_by(year, month) %>% 
+  summarise(
+    n_homicides = n(),
+    .groups = "drop") %>% 
+  mutate(
+    month_date = ymd(paste(year, month, "01", sep = "-")),
+    season = ifelse(month %in% c(11,12,1,2,3,4),
+                    "Winter", "Summer"))
+
+```
+
+# Freddie Arrested Option 2
+```{r}
+freddie_arrest <- ymd("2015-04-12")
+
+freddie_ref_line <- max(baltimore_monthly$n_homicides)
+
+```
+
+# Plot Option 2
+
+```{r, fig.width=7, fig.height=4.5}
+ggplot(baltimore_monthly, 
+       aes(x = month_date, 
+           y = n_homicides)) +
+  geom_bar(
+    aes(fill = season), 
+    stat = "identity") +
+  geom_smooth(
+    aes(group = 1),
+    se = FALSE,
+    color = "blue",
+    size  = 1) +
+  geom_vline(
+    xintercept = freddie_arrest,
+    linetype = "dashed",
+    color = "red3",
+    size = 1) +
+  annotate(
+    "text",
+    x = freddie_arrest,
+    y = freddie_ref_line,
+    label = "Arrest of\nFreddie Gray",
+    color = "white",
+    hjust = 1.2,
+    vjust = 1) +
+  scale_fill_manual(
+    values = c("Winter" = "lightblue2",
+               "Summer" = "lightgray"),
+    name = "") +
+  labs(
+    title = "Homicides in Baltimore, MD",
+    x = "Date",
+    y = "Monthly homicides") +
+  theme_dark() +
+  theme(
+    legend.position = "bottom",
+    legend.box = "horizontal")
 ```
 
