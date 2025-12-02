@@ -18,5 +18,21 @@ library(sf)
 library(lubridate)
 library(broom)
 
+homicides <- read.csv("homicide-data.csv") %>% 
+  mutate(city_name = paste(city, state, sep = ", "))
+
+```
+
+
+# Cleaning
+
+```{r}
+los_angeles <- homicides %>% 
+  filter(city == "Los Angeles", state == "CA") %>%
+  mutate(
+    date = ymd(reported_date),
+    year = year(date),
+    month = month(date)
+  )
 ```
 
