@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 library(tidyverse)
 
-homicides <- read.csv("homicide-data.csv") %>% 
+homicides <- read.csv("/Users/kui/Desktop/ERHS 535/535_HW5/raw_data/homicide-data.csv") %>% 
   mutate(city_name = paste(city, state, sep = ", "))
 
 ```
