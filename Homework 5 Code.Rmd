@@ -61,7 +61,7 @@ ggplot(baltimore_monthly,
     aes(fill = season), 
     stat = "identity") +
   geom_smooth(
-    aes(group = 1, method = "loess"),
+    aes(group = 1),
     se = FALSE,
     color = "blue",
     size  = 1) +
